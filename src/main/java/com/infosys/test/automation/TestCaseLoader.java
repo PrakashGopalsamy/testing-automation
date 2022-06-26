@@ -46,7 +46,7 @@ public class TestCaseLoader {
 
     private void processStartElement(XMLStreamReader xmlStreamReader) throws Exception{
         String name = xmlStreamReader.getLocalName();
-        System.out.println("Element Name : "+name);
+//        System.out.println("Element Name : "+name);
         switch (name.toUpperCase(Locale.ROOT)){
             case TestConfigConstants.TEST:{
                 currentBuilderType = TestElement.TestElementBuilder.class;
@@ -78,30 +78,35 @@ public class TestCaseLoader {
                 ((TestCaseElement.TestCaseElementBuilder) currentBuilder).setType(xmlStreamReader.getAttributeValue(0));
                 break;
             }
-            case TestConfigConstants.FILTERCONDITION:{
+            case TestConfigConstants.MULTIJOINCONDITION:
+            case TestConfigConstants.MULTIFILTERCONDITION :{
                 if (currentBuilder !=null){
                     builderTracker.push(currentBuilder);
                 }
-                currentBuilder = new FilterCondElement.FilterCondElementBuilder();
+                currentBuilder = new MultiCondElement.MultiCondElementBuilder();
+                int attriCount = xmlStreamReader.getAttributeCount();
+//                System.out.println("Multi Condition elem");
+//                for (int i=0 ; i<attriCount;i++){
+//                    System.out.println("Element name : "+xmlStreamReader.getAttributeName(i));
+//                    System.out.println("Element value : "+xmlStreamReader.getAttributeValue(i));
+//                }
+                ((MultiCondElement.MultiCondElementBuilder) currentBuilder).setLogicalOp(xmlStreamReader.getAttributeValue(0));
                 break;
             }
-            case TestConfigConstants.JOINCONDITION:{
+            case TestConfigConstants.SINGLEJOINCONDITION:
+            case TestConfigConstants.SINGLEFILTERCONDITION:{
                 if (currentBuilder !=null){
                     builderTracker.push(currentBuilder);
                 }
-                currentBuilder = new JoinCondElement.JoinCondElementBuilder();
+                currentBuilder = new SingleCondElement.SingleCondElementBuilder();
+                ((SingleCondElement.SingleCondElementBuilder) currentBuilder).setOperator(xmlStreamReader.getAttributeValue(0));
                 break;
             }
             case TestConfigConstants.COLUMN:{
                 int event = xmlStreamReader.next();
                 if (event == XMLStreamConstants.CHARACTERS && !xmlStreamReader.isWhiteSpace()){
                     String column = xmlStreamReader.getText().trim();
-                    if (currentBuilder instanceof FilterCondElement.FilterCondElementBuilder){
-                        ((FilterCondElement.FilterCondElementBuilder) currentBuilder).setColumn(column);
-                    }
-                    if (currentBuilder instanceof JoinCondElement.JoinCondElementBuilder){
-                        ((JoinCondElement.JoinCondElementBuilder) currentBuilder).setColumn(column);
-                    }
+                    ((SingleCondElement.SingleCondElementBuilder) currentBuilder).setColumn(column);
                 }
                 break;
             }
@@ -109,25 +114,7 @@ public class TestCaseLoader {
                 int event = xmlStreamReader.next();
                 if (event == XMLStreamConstants.CHARACTERS && !xmlStreamReader.isWhiteSpace()){
                     String value = xmlStreamReader.getText().trim();
-                    if (currentBuilder instanceof FilterCondElement.FilterCondElementBuilder){
-                        ((FilterCondElement.FilterCondElementBuilder) currentBuilder).setValue(value);
-                    }
-                    if (currentBuilder instanceof JoinCondElement.JoinCondElementBuilder){
-                        ((JoinCondElement.JoinCondElementBuilder) currentBuilder).setValue(value);
-                    }
-                }
-                break;
-            }
-            case TestConfigConstants.OPERATOR:{
-                int event = xmlStreamReader.next();
-                if (event == XMLStreamConstants.CHARACTERS && !xmlStreamReader.isWhiteSpace()){
-                    String operator = xmlStreamReader.getText().trim();
-                    if (currentBuilder instanceof FilterCondElement.FilterCondElementBuilder){
-                        ((FilterCondElement.FilterCondElementBuilder) currentBuilder).setOperator(operator);
-                    }
-                    if (currentBuilder instanceof JoinCondElement.JoinCondElementBuilder){
-                        ((JoinCondElement.JoinCondElementBuilder) currentBuilder).setOperator(operator);
-                    }
+                    ((SingleCondElement.SingleCondElementBuilder) currentBuilder).setValue(value);
                 }
                 break;
             }
@@ -155,7 +142,7 @@ public class TestCaseLoader {
 
     private void processEndElement(XMLStreamReader xmlStreamReader){
         String name = xmlStreamReader.getLocalName();
-        System.out.println("Element Name : "+name);
+//        System.out.println("Element Name : "+name);
         switch (name.toUpperCase(Locale.ROOT)){
             case TestConfigConstants.TEST:{
                testMetadata = ((TestElement.TestElementBuilder)currentBuilder).build();
@@ -184,25 +171,53 @@ public class TestCaseLoader {
                 ((TestElement.TestElementBuilder)currentBuilder).addTestCase(testCase);
                 break;
             }
-            case TestConfigConstants.FILTERCONDITION:{
-                FilterCondElement filterCondElem = ((FilterCondElement.FilterCondElementBuilder)currentBuilder).build();
+            case TestConfigConstants.SINGLEFILTERCONDITION:{
+                SingleCondElement singleCondElem = ((SingleCondElement.SingleCondElementBuilder)currentBuilder).build();
                 currentBuilder = builderTracker.pop();
-                if (currentBuilder instanceof FilterCondElement.FilterCondElementBuilder){
-                    ((FilterCondElement.FilterCondElementBuilder) currentBuilder).setFilterCondition(filterCondElem);
+                if (currentBuilder instanceof MultiCondElement.MultiCondElementBuilder){
+                    ((MultiCondElement.MultiCondElementBuilder) currentBuilder).setSingleCond(singleCondElem);
                 }
                 if (currentBuilder instanceof SourceElement.SourceElementBuilder){
-                    ((SourceElement.SourceElementBuilder) currentBuilder).setFilterCondition(filterCondElem);
+                    ((SourceElement.SourceElementBuilder) currentBuilder).setFilterCondition(singleCondElem);
                 }
                 break;
             }
-            case TestConfigConstants.JOINCONDITION:{
-                JoinCondElement joinCondElement = ((JoinCondElement.JoinCondElementBuilder)currentBuilder).build();
+            case TestConfigConstants.SINGLEJOINCONDITION:{
+                SingleCondElement singleCondElem = ((SingleCondElement.SingleCondElementBuilder)currentBuilder).build();
                 currentBuilder = builderTracker.pop();
-                if (currentBuilder instanceof JoinCondElement.JoinCondElementBuilder){
-                    ((JoinCondElement.JoinCondElementBuilder) currentBuilder).setJoinCondition(joinCondElement);
+                if (currentBuilder instanceof MultiCondElement.MultiCondElementBuilder){
+                    ((MultiCondElement.MultiCondElementBuilder) currentBuilder).setSingleCond(singleCondElem);
                 }
                 if (currentBuilder instanceof SourceElement.SourceElementBuilder){
-                    ((SourceElement.SourceElementBuilder) currentBuilder).setJoinCondition(joinCondElement);
+                    ((SourceElement.SourceElementBuilder) currentBuilder).setJoinCondition(singleCondElem);
+                }
+                if (currentBuilder instanceof TargetElement.TargetElementBuilder){
+                    ((TargetElement.TargetElementBuilder) currentBuilder).setJoinCondition(singleCondElem);
+                }
+                break;
+            }
+            case TestConfigConstants.MULTIFILTERCONDITION:{
+                MultiCondElement multiCondElement = ((MultiCondElement.MultiCondElementBuilder)currentBuilder).build();
+                currentBuilder = builderTracker.pop();
+                if (currentBuilder instanceof MultiCondElement.MultiCondElementBuilder){
+                    ((MultiCondElement.MultiCondElementBuilder) currentBuilder).setMultiCond(multiCondElement);
+                }
+                if (currentBuilder instanceof SourceElement.SourceElementBuilder){
+                    ((SourceElement.SourceElementBuilder) currentBuilder).setFilterCondition(multiCondElement);
+                }
+                break;
+            }
+            case TestConfigConstants.MULTIJOINCONDITION:{
+                MultiCondElement multiCondElement = ((MultiCondElement.MultiCondElementBuilder)currentBuilder).build();
+                currentBuilder = builderTracker.pop();
+                if (currentBuilder instanceof MultiCondElement.MultiCondElementBuilder){
+                    ((MultiCondElement.MultiCondElementBuilder) currentBuilder).setMultiCond(multiCondElement);
+                }
+                if (currentBuilder instanceof SourceElement.SourceElementBuilder){
+                    ((SourceElement.SourceElementBuilder) currentBuilder).setJoinCondition(multiCondElement);
+                }
+                if (currentBuilder instanceof TargetElement.TargetElementBuilder){
+                    ((TargetElement.TargetElementBuilder) currentBuilder).setJoinCondition(multiCondElement);
                 }
                 break;
             }
@@ -211,11 +226,11 @@ public class TestCaseLoader {
 
     private void processProperties(XMLStreamReader xmlStreamReader,String elementName) throws Exception{
         if (!(elementName.equalsIgnoreCase("Sources") &&
-                elementName.equalsIgnoreCase("FilterConditions") &&
-                elementName.equalsIgnoreCase("JoinConditions") &&
+                elementName.equalsIgnoreCase("MultiFilterCondition") &&
+                elementName.equalsIgnoreCase("SingleFilterCondition") &&
                 elementName.equalsIgnoreCase("TestCases") &&
-                elementName.equalsIgnoreCase("FilterCondition") &&
-                elementName.equalsIgnoreCase("JoinCondition") &&
+                elementName.equalsIgnoreCase("SingleFilterCondition") &&
+                elementName.equalsIgnoreCase("SingleJoinCondition") &&
                 elementName.equalsIgnoreCase("column") &&
         elementName.equalsIgnoreCase("value"))
         ){

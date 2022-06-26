@@ -9,12 +9,12 @@ public class SourceElement {
     private String type;
     private List<SourceElement> dependentSources;
     private Properties sourceProperties;
-    private FilterCondElement filterCondElement;
-    private JoinCondElement joinCondElement;
+    private CondElement filterCondElement;
+    private CondElement joinCondElement;
     private SourceElement(){
 
     }
-    private SourceElement(String name, String type, List<SourceElement> dependentSources, Properties sourceProperties,FilterCondElement filterCondElement,JoinCondElement joinCondElement){
+    private SourceElement(String name, String type, List<SourceElement> dependentSources, Properties sourceProperties, CondElement filterCondElement, CondElement joinCondElement){
         this.name = name;
         this.type = type;
         this.dependentSources = dependentSources;
@@ -51,8 +51,8 @@ public class SourceElement {
         private String type;
         private List<SourceElement> dependentSources = new ArrayList<SourceElement>();
         private Properties sourceProperties = new Properties();
-        private FilterCondElement filterCondElement;
-        private JoinCondElement joinCondElement;
+        private CondElement filterCondElement;
+        private CondElement joinCondElement;
         public SourceElement.SourceElementBuilder createBuilder(){
             return new SourceElement.SourceElementBuilder();
         }
@@ -72,11 +72,11 @@ public class SourceElement {
             this.sourceProperties.setProperty(key,value);
             return this;
         }
-        public SourceElementBuilder setFilterCondition(FilterCondElement filterCondElement){
+        public SourceElementBuilder setFilterCondition(CondElement filterCondElement){
             this.filterCondElement = filterCondElement;
             return this;
         }
-        public SourceElementBuilder setJoinCondition(JoinCondElement joinCondElement){
+        public SourceElementBuilder setJoinCondition(CondElement joinCondElement){
             this.joinCondElement = joinCondElement;
             return this;
         }

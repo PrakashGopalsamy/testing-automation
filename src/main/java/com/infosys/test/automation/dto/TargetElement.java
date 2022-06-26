@@ -6,14 +6,15 @@ public class TargetElement {
     private String name;
     private String type;
     private Properties targetProperties;
+    private CondElement joinCondElement;
     private TargetElement(){
 
     }
-    private TargetElement(String name,String type,Properties targetProperties){
+    private TargetElement(String name,String type,Properties targetProperties,CondElement joinCondElement){
         this.name = name;
         this.type = type;
         this.targetProperties = targetProperties;
-
+        this.joinCondElement = joinCondElement;
     }
     public String toString(){
         StringBuilder stringBuilder = new StringBuilder();
@@ -21,6 +22,9 @@ public class TargetElement {
         stringBuilder.append(" , name -> "+this.name);
         stringBuilder.append(" , type -> "+this.type);
         stringBuilder.append(" , target properties -> "+this.targetProperties);
+        if (joinCondElement != null){
+            stringBuilder.append(" , join condition -> "+this.joinCondElement);
+        }
         stringBuilder.append(" }");
         return stringBuilder.toString();
     }
@@ -29,6 +33,7 @@ public class TargetElement {
         private String name;
         private String type;
         private Properties targetProperties = new Properties();
+        private CondElement joinCondElement;
         public TargetElement.TargetElementBuilder createBuilder(){
             return new TargetElement.TargetElementBuilder();
         }
@@ -44,8 +49,12 @@ public class TargetElement {
             this.targetProperties.setProperty(key,value);
             return this;
         }
+        public TargetElement.TargetElementBuilder setJoinCondition(CondElement joinCondElement){
+            this.joinCondElement = joinCondElement;
+            return this;
+        }
         public TargetElement build(){
-            return new TargetElement(name,type,targetProperties);
+            return new TargetElement(name,type,targetProperties,joinCondElement);
         }
     }
 }
