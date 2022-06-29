@@ -5,6 +5,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 public class SingleCondElement implements CondElement {
@@ -32,11 +35,15 @@ public class SingleCondElement implements CondElement {
     @Override
     public boolean evaluateCondition(String parentRecord, String childRecord) throws ParseException {
         JSONParser jsonParser = new JSONParser();
+//        System.out.println("Parent Record : "+parentRecord);
+//        System.out.println("Child Record : "+childRecord);
         JSONObject parentObject = (JSONObject) jsonParser.parse(parentRecord);
+//        System.out.println("Parent object : "+parentObject.toJSONString());
         JSONObject childObject = (JSONObject) jsonParser.parse(childRecord);
+//        System.out.println("child object : " + childObject.toJSONString());
         String matchValue = null;
         if (value.contains("${")){
-            matchValue = matchValue.replaceAll("\\{","");
+            matchValue = value.replaceAll("\\{","");
             matchValue = matchValue.replaceAll("\\}","");
             matchValue = matchValue.replaceAll("\\$","");
             matchValue = (String)parentObject.get(matchValue);
@@ -47,10 +54,20 @@ public class SingleCondElement implements CondElement {
         boolean condRes = false;
         switch(operator.toUpperCase(Locale.ROOT)){
             case CondOperatorConstants.eq:
-                condRes = matchValue.equals(childValue);
+                if (matchValue.contains(",")){
+                    List<String> valueList=Arrays.asList(matchValue.split(","));
+                    condRes = valueList.contains(childValue);
+                } else{
+                    condRes = matchValue.equals(childValue);
+                }
                 break;
             case CondOperatorConstants.neq:
-                condRes = !matchValue.equals(childValue);
+                if (matchValue.contains(",")){
+                    List<String> valueList=Arrays.asList(matchValue.split(","));
+                    condRes = !valueList.contains(childValue);
+                } else{
+                    condRes = !matchValue.equals(childValue);
+                }
                 break;
         }
         return condRes;

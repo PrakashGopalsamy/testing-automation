@@ -22,14 +22,29 @@ public class Tester {
         List<String> child = new ArrayList<>();
         child.add("three");
         child.add("five");
-        List<String> filteredChildRecords = child.stream().filter(childRecord ->{
-            System.out.println("Child Record : "+childRecord);
-            return parent.stream().anyMatch(parentRecord -> parentRecord.equals(childRecord));
+        List<String> filteredChildRecords = parent.stream().filter(childRecord ->{
+            System.out.println("Parent Record : "+childRecord);
+            return child.stream().anyMatch(parentRecord -> parentRecord.equals(childRecord));
         }
 
         ).collect(Collectors.toList());
         for (String flt: filteredChildRecords){
             System.out.println("Filtered record : "+flt);
+        }
+        List<String> framedResult = parent.stream().flatMap(parentRecord ->{
+                    System.out.println("Parent Record : "+parentRecord);
+                    List<String> matchChild = child.stream().map(childRecord -> {
+                        if (childRecord.equals(parentRecord)){
+                            return parentRecord+":"+childRecord;
+                        } else{
+                            return parentRecord+":NA";
+                        }
+                    }).collect(Collectors.toList());
+                    return matchChild.stream();
+                }
+        ).collect(Collectors.toList());
+        for (String flt: framedResult){
+            System.out.println("Result record : "+flt);
         }
     }
 }
