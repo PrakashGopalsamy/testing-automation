@@ -37,12 +37,12 @@ public class SingleCondElement implements CondElement {
         JSONParser jsonParser = new JSONParser();
 //        System.out.println("Parent Record : "+parentRecord);
 //        System.out.println("Child Record : "+childRecord);
-        JSONObject parentObject = (JSONObject) jsonParser.parse(parentRecord);
 //        System.out.println("Parent object : "+parentObject.toJSONString());
         JSONObject childObject = (JSONObject) jsonParser.parse(childRecord);
 //        System.out.println("child object : " + childObject.toJSONString());
         String matchValue = null;
         if (value.contains("${")){
+            JSONObject parentObject = (JSONObject) jsonParser.parse(parentRecord);
             matchValue = value.replaceAll("\\{","");
             matchValue = matchValue.replaceAll("\\}","");
             matchValue = matchValue.replaceAll("\\$","");
