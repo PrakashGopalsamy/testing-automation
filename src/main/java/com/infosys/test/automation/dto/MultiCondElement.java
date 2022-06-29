@@ -1,5 +1,10 @@
 package com.infosys.test.automation.dto;
 
+import com.infosys.test.automation.constants.CondOperatorConstants;
+import org.json.simple.parser.ParseException;
+
+import java.util.Locale;
+
 public class MultiCondElement implements CondElement {
     private String logicalOp;
     private SingleCondElement filterElem1;
@@ -37,6 +42,69 @@ public class MultiCondElement implements CondElement {
         }
         stringBuilder.append("}");
         return stringBuilder.toString();
+    }
+
+    @Override
+    public boolean evaluateCondition(String parentRecord, String childRecord) throws ParseException {
+        boolean [] evaluationResults = new boolean [4];
+        if (filterElem1 != null){
+            evaluationResults[0]=filterElem1.evaluateCondition(parentRecord,childRecord);
+        } else{
+            if (logicalOp.equalsIgnoreCase(CondOperatorConstants.and)){
+                evaluationResults[0] = true;
+            } else{
+                evaluationResults[0] = false;
+            }
+        }
+        if (filterElem2 != null){
+            evaluationResults[1]=filterElem2.evaluateCondition(parentRecord,childRecord);
+        } else{
+            if (logicalOp.equalsIgnoreCase(CondOperatorConstants.and)){
+                evaluationResults[1] = true;
+            } else{
+                evaluationResults[1] = false;
+            }
+        }
+        if (filterElem3 != null){
+            evaluationResults[2]=filterElem3.evaluateCondition(parentRecord,childRecord);
+        } else{
+            if (logicalOp.equalsIgnoreCase(CondOperatorConstants.and)){
+                evaluationResults[2] = true;
+            } else{
+                evaluationResults[2] = false;
+            }
+        }
+        if (filterElem4 != null){
+            evaluationResults[3]=filterElem4.evaluateCondition(parentRecord,childRecord);
+        } else{
+            if (logicalOp.equalsIgnoreCase(CondOperatorConstants.and)){
+                evaluationResults[3] = true;
+            } else{
+                evaluationResults[3] = false;
+            }
+        }
+        boolean result = false;
+        switch (logicalOp.toUpperCase(Locale.ROOT)){
+            case CondOperatorConstants.and:
+                result = true;
+                for (int i=0;i<4;i++){
+                    if (!evaluationResults[i]){
+                        result = false;
+                        break;
+                    }
+                }
+                break;
+            case CondOperatorConstants.or:
+                result = false;
+                for (int i=0;i<4;i++){
+                    if (evaluationResults[i]){
+                        result = true;
+                        break;
+                    }
+                }
+                break;
+        }
+        return result;
     }
 
     public static class MultiCondElementBuilder{

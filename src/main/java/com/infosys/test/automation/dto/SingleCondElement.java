@@ -1,5 +1,12 @@
 package com.infosys.test.automation.dto;
 
+import com.infosys.test.automation.constants.CondOperatorConstants;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.util.Locale;
+
 public class SingleCondElement implements CondElement {
     private String operator;
     private String column;
@@ -20,6 +27,33 @@ public class SingleCondElement implements CondElement {
         stringBuilder.append(" , condition value -> "+value+"\n");
         stringBuilder.append("}");
         return stringBuilder.toString();
+    }
+
+    @Override
+    public boolean evaluateCondition(String parentRecord, String childRecord) throws ParseException {
+        JSONParser jsonParser = new JSONParser();
+        JSONObject parentObject = (JSONObject) jsonParser.parse(parentRecord);
+        JSONObject childObject = (JSONObject) jsonParser.parse(childRecord);
+        String matchValue = null;
+        if (value.contains("${")){
+            matchValue = matchValue.replaceAll("\\{","");
+            matchValue = matchValue.replaceAll("\\}","");
+            matchValue = matchValue.replaceAll("\\$","");
+            matchValue = (String)parentObject.get(matchValue);
+        } else{
+            matchValue = value;
+        }
+        String childValue = (String)childObject.get(column);
+        boolean condRes = false;
+        switch(operator.toUpperCase(Locale.ROOT)){
+            case CondOperatorConstants.eq:
+                condRes = matchValue.equals(childValue);
+                break;
+            case CondOperatorConstants.neq:
+                condRes = !matchValue.equals(childValue);
+                break;
+        }
+        return condRes;
     }
 
     public static class SingleCondElementBuilder{
