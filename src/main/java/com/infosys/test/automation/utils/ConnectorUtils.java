@@ -22,7 +22,7 @@ public class ConnectorUtils {
             }
         }
         if (connectorClass == null){
-            connectorClass = Class.forName("");
+            connectorClass = Class.forName(serviceName);
         }
         return connectorClass;
     }
