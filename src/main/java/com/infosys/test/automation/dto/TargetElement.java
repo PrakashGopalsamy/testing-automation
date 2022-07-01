@@ -1,5 +1,9 @@
 package com.infosys.test.automation.dto;
 
+import com.infosys.test.automation.connectors.Connector;
+import com.infosys.test.automation.utils.ConnectorUtils;
+
+import java.util.List;
 import java.util.Properties;
 
 public class TargetElement {
@@ -7,6 +11,7 @@ public class TargetElement {
     private String type;
     private Properties targetProperties;
     private CondElement joinCondElement;
+    private List<String> parentRecords = null;
     private TargetElement(){
 
     }
@@ -16,6 +21,14 @@ public class TargetElement {
         this.targetProperties = targetProperties;
         this.joinCondElement = joinCondElement;
     }
+
+    public List<String> readTargetData(List<String> parentData) throws Exception {
+        parentRecords = parentData;
+        Connector targetConnector = ConnectorUtils.createConnetor(this.type,this.name,this.targetProperties,this.parentRecords,null,joinCondElement);
+        this.parentRecords = targetConnector.getData();
+        return this.parentRecords;
+    }
+
     public String toString(){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(" { element type -> target");

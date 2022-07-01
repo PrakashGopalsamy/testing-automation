@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class TestElement {
+public class TestConfig {
     private String name;
     private String type;
     private List<SourceElement> sources;
     private List<TargetElement> targets;
     private List<TestCaseElement> testCases;
     private Properties testProperties;
-    private TestElement(){
+    private List<String> parentRecords = null;
+    private TestConfig(){
 
     }
-    private TestElement(String name, String type, List<SourceElement> sources, List<TargetElement> targets,
-                        List<TestCaseElement> testCases, Properties testProperties){
+    private TestConfig(String name, String type, List<SourceElement> sources, List<TargetElement> targets,
+                       List<TestCaseElement> testCases, Properties testProperties){
         this.name = name;
         this.type = type;
         this.sources = sources;
@@ -24,6 +25,33 @@ public class TestElement {
         this.testProperties = testProperties;
 
     }
+
+    private void readSourceData() throws Exception {
+        this.sources.stream().forEach(source -> {
+            try {
+                this.parentRecords = source.readSourceData(this.parentRecords);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void readTargetData() throws Exception {
+        this.targets.stream().forEach(target -> {
+            try {
+                this.parentRecords = target.readTargetData(this.parentRecords);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public List<String> readTestData() throws Exception {
+        readSourceData();
+        readTargetData();
+        return this.parentRecords;
+    }
+
     public String toString(){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(" { element type -> test \n");
@@ -64,42 +92,42 @@ public class TestElement {
         return stringBuilder.toString();
     }
 
-    public static class TestElementBuilder{
+    public static class TestConfigBuilder {
         private String name;
         private String type;
         private List<SourceElement> sources = new ArrayList<SourceElement>();
         private List<TargetElement> targets = new ArrayList<TargetElement>();
         private List<TestCaseElement> testCases = new ArrayList<TestCaseElement>();
         private Properties testProperties = new Properties();
-        public TestElementBuilder createBuilder(){
-            return new TestElementBuilder();
+        public TestConfigBuilder createBuilder(){
+            return new TestConfigBuilder();
         }
-        public TestElementBuilder setName(String name){
+        public TestConfigBuilder setName(String name){
             this.name = name;
             return this;
         }
-        public TestElementBuilder setType(String type){
+        public TestConfigBuilder setType(String type){
             this.type = type;
             return this;
         }
-        public TestElementBuilder addSource(SourceElement processElement){
+        public TestConfigBuilder addSource(SourceElement processElement){
             this.sources.add(processElement);
             return this;
         }
-        public TestElementBuilder addTarget(TargetElement processElement){
+        public TestConfigBuilder addTarget(TargetElement processElement){
             this.targets.add(processElement);
             return this;
         }
-        public TestElementBuilder addTestCase(TestCaseElement processElement){
+        public TestConfigBuilder addTestCase(TestCaseElement processElement){
             this.testCases.add(processElement);
             return this;
         }
-        public TestElementBuilder addProperty(String key, String value){
+        public TestConfigBuilder addProperty(String key, String value){
             this.testProperties.setProperty(key,value);
             return this;
         }
-        public TestElement build(){
-            return new TestElement(name,type,sources,targets,testCases,testProperties);
+        public TestConfig build(){
+            return new TestConfig(name,type,sources,targets,testCases,testProperties);
         }
     }
 

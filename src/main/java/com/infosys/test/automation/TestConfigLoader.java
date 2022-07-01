@@ -10,19 +10,19 @@ import java.io.*;
 import java.util.Locale;
 import java.util.Stack;
 
-public class TestCaseLoader {
-    String testConfig ;
+public class TestConfigLoader {
+    String testConfigFile ;
     Object currentBuilder = null;
     Class<?> currentBuilderType = null;
     Stack<Object> builderTracker = new Stack<>();
-    TestElement testMetadata = null;
+    TestConfig testMetadata = null;
 
-    public TestCaseLoader (String testConfig){
-        this.testConfig = testConfig;
+    public TestConfigLoader(String testConfigFile){
+        this.testConfigFile = testConfigFile;
     }
 
-    public TestElement load() throws Exception{
-        FileInputStream fileInputStream = new FileInputStream(testConfig);
+    public TestConfig load() throws Exception{
+        FileInputStream fileInputStream = new FileInputStream(testConfigFile);
         InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty("javax.xml.stream.isCoalescing", true);
@@ -49,9 +49,9 @@ public class TestCaseLoader {
 //        System.out.println("Element Name : "+name);
         switch (name.toUpperCase(Locale.ROOT)){
             case TestConfigConstants.TEST:{
-                currentBuilderType = TestElement.TestElementBuilder.class;
-                currentBuilder = new TestElement.TestElementBuilder();
-                ((TestElement.TestElementBuilder) currentBuilder).setType(xmlStreamReader.getAttributeValue(0));
+                currentBuilderType = TestConfig.TestConfigBuilder.class;
+                currentBuilder = new TestConfig.TestConfigBuilder();
+                ((TestConfig.TestConfigBuilder) currentBuilder).setType(xmlStreamReader.getAttributeValue(0));
                 break;
             }
             case TestConfigConstants.SOURCE:{
@@ -120,8 +120,8 @@ public class TestCaseLoader {
             }
             case TestConfigConstants.NAME:{
                 xmlStreamReader.next();
-                if (currentBuilder instanceof TestElement.TestElementBuilder){
-                    ((TestElement.TestElementBuilder) currentBuilder).setName(xmlStreamReader.getText().trim());
+                if (currentBuilder instanceof TestConfig.TestConfigBuilder){
+                    ((TestConfig.TestConfigBuilder) currentBuilder).setName(xmlStreamReader.getText().trim());
                 }
                 if (currentBuilder instanceof SourceElement.SourceElementBuilder){
                     ((SourceElement.SourceElementBuilder) currentBuilder).setName(xmlStreamReader.getText().trim());
@@ -145,14 +145,14 @@ public class TestCaseLoader {
 //        System.out.println("Element Name : "+name);
         switch (name.toUpperCase(Locale.ROOT)){
             case TestConfigConstants.TEST:{
-               testMetadata = ((TestElement.TestElementBuilder)currentBuilder).build();
+               testMetadata = ((TestConfig.TestConfigBuilder)currentBuilder).build();
                 break;
             }
             case TestConfigConstants.SOURCE:{
                 SourceElement source = ((SourceElement.SourceElementBuilder)currentBuilder).build();
                 currentBuilder = builderTracker.pop();
-                if (currentBuilder instanceof TestElement.TestElementBuilder){
-                    ((TestElement.TestElementBuilder) currentBuilder).addSource(source);
+                if (currentBuilder instanceof TestConfig.TestConfigBuilder){
+                    ((TestConfig.TestConfigBuilder) currentBuilder).addSource(source);
                 }
                 if (currentBuilder instanceof SourceElement.SourceElementBuilder){
                     ((SourceElement.SourceElementBuilder) currentBuilder).addDependetSource(source);
@@ -162,13 +162,13 @@ public class TestCaseLoader {
             case TestConfigConstants.TARGET:{
                 TargetElement target = ((TargetElement.TargetElementBuilder)currentBuilder).build();
                 currentBuilder = builderTracker.pop();
-                ((TestElement.TestElementBuilder)currentBuilder).addTarget(target);
+                ((TestConfig.TestConfigBuilder)currentBuilder).addTarget(target);
                 break;
             }
             case TestConfigConstants.TESTCASE:{
                 TestCaseElement testCase = ((TestCaseElement.TestCaseElementBuilder) currentBuilder).build();
                 currentBuilder = builderTracker.pop();
-                ((TestElement.TestElementBuilder)currentBuilder).addTestCase(testCase);
+                ((TestConfig.TestConfigBuilder)currentBuilder).addTestCase(testCase);
                 break;
             }
             case TestConfigConstants.SINGLEFILTERCONDITION:{
@@ -237,8 +237,8 @@ public class TestCaseLoader {
             int event = xmlStreamReader.next();
             if (event == XMLStreamConstants.CHARACTERS && !xmlStreamReader.isWhiteSpace()){
                 String value = xmlStreamReader.getText().trim();
-                if (currentBuilder instanceof TestElement.TestElementBuilder){
-                    ((TestElement.TestElementBuilder) currentBuilder).addProperty(elementName,value);
+                if (currentBuilder instanceof TestConfig.TestConfigBuilder){
+                    ((TestConfig.TestConfigBuilder) currentBuilder).addProperty(elementName,value);
                 }
                 if (currentBuilder instanceof SourceElement.SourceElementBuilder){
                     ((SourceElement.SourceElementBuilder) currentBuilder).addProperty(elementName,value);

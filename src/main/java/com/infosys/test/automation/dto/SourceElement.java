@@ -1,5 +1,8 @@
 package com.infosys.test.automation.dto;
 
+import com.infosys.test.automation.connectors.Connector;
+import com.infosys.test.automation.utils.ConnectorUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -11,6 +14,7 @@ public class SourceElement {
     private Properties sourceProperties;
     private CondElement filterCondElement;
     private CondElement joinCondElement;
+    private List<String> parentRecords = null;
     private SourceElement(){
 
     }
@@ -21,6 +25,19 @@ public class SourceElement {
         this.sourceProperties = sourceProperties;
         this.filterCondElement = filterCondElement;
         this.joinCondElement = joinCondElement;
+    }
+    public List<String> readSourceData(List<String> parentData) throws Exception {
+        parentRecords = parentData;
+        Connector sourceConnector = ConnectorUtils.createConnetor(this.type,this.name,this.sourceProperties,this.parentRecords,filterCondElement,joinCondElement);
+        this.parentRecords = sourceConnector.getData();
+        this.dependentSources.stream().forEach(dependentSource -> {
+            try {
+                this.parentRecords = dependentSource.readSourceData(this.parentRecords);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return this.parentRecords;
     }
     public String toString(){
         StringBuilder stringBuilder = new StringBuilder();
