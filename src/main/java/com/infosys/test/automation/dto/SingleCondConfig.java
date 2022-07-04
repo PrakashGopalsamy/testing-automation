@@ -6,18 +6,17 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class SingleCondElement implements CondElement {
+public class SingleCondConfig implements CondConfig {
     private String operator;
     private String column;
     private String value;
-    private SingleCondElement(){
+    private SingleCondConfig(){
 
     }
-    private SingleCondElement(String operator, String column, String value){
+    private SingleCondConfig(String operator, String column, String value){
         this.operator = operator;
         this.column = column;
         this.value = value;
@@ -73,24 +72,24 @@ public class SingleCondElement implements CondElement {
         return condRes;
     }
 
-    public static class SingleCondElementBuilder{
+    public static class SingleCondConfigBuilder {
         private String operator;
         private String column;
         private String value;
-        public SingleCondElementBuilder setOperator(String operator){
+        public SingleCondConfigBuilder setOperator(String operator){
             this.operator = operator;
             return this;
         }
-        public SingleCondElementBuilder setColumn(String column){
+        public SingleCondConfigBuilder setColumn(String column){
             this.column = column;
             return this;
         }
-        public SingleCondElementBuilder setValue(String value){
+        public SingleCondConfigBuilder setValue(String value){
             this.value = value;
             return this;
         }
-        public SingleCondElement build(){
-            return new SingleCondElement(operator,column,value);
+        public SingleCondConfig build(){
+            return new SingleCondConfig(operator,column,value);
         }
     }
 }

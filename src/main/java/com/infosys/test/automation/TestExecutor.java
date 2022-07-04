@@ -12,12 +12,16 @@ public class TestExecutor {
         this.testConfigFile = testConfigFile;
     }
 
-    public void executeTest() throws Exception {
+    public String executeTest() throws Exception {
         TestConfigLoader testConfigLoader = new TestConfigLoader(this.testConfigFile);
         TestConfig testConfig = testConfigLoader.load();
+        System.out.println("Test Config : "+testConfig);
         List<String> testDatas = testConfig.readTestData();
-        for(String testData: testDatas){
-            System.out.println("test data : "+testData);
-        }
+//        for(String testData: testDatas){
+//            System.out.println("test data : "+testData);
+//        }
+        String testResult = testConfig.executeTestCases();
+        System.out.println("Test Result : "+testResult);
+        return testResult;
     }
 }

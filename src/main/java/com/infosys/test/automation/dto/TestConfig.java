@@ -1,22 +1,28 @@
 package com.infosys.test.automation.dto;
 
+import com.infosys.test.automation.constants.TestResultConstants;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class TestConfig {
     private String name;
     private String type;
-    private List<SourceElement> sources;
-    private List<TargetElement> targets;
-    private List<TestCaseElement> testCases;
+    private List<SourceConfig> sources;
+    private List<TargetConfig> targets;
+    private List<TestCaseConfig> testCases;
     private Properties testProperties;
-    private List<String> parentRecords = null;
+    private List<String> testRecords = null;
     private TestConfig(){
 
     }
-    private TestConfig(String name, String type, List<SourceElement> sources, List<TargetElement> targets,
-                       List<TestCaseElement> testCases, Properties testProperties){
+    private TestConfig(String name, String type, List<SourceConfig> sources, List<TargetConfig> targets,
+                       List<TestCaseConfig> testCases, Properties testProperties){
         this.name = name;
         this.type = type;
         this.sources = sources;
@@ -29,7 +35,7 @@ public class TestConfig {
     private void readSourceData() throws Exception {
         this.sources.stream().forEach(source -> {
             try {
-                this.parentRecords = source.readSourceData(this.parentRecords);
+                this.testRecords = source.readSourceData(this.testRecords);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -39,7 +45,7 @@ public class TestConfig {
     private void readTargetData() throws Exception {
         this.targets.stream().forEach(target -> {
             try {
-                this.parentRecords = target.readTargetData(this.parentRecords);
+                this.testRecords = target.readTargetData(this.testRecords);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -48,8 +54,34 @@ public class TestConfig {
 
     public List<String> readTestData() throws Exception {
         readSourceData();
+//        for(String sourcData: testRecords){
+//            System.out.println("Source data: "+sourcData);
+//        }
         readTargetData();
-        return this.parentRecords;
+        return this.testRecords;
+    }
+
+    public String executeTestCases(){
+        JSONObject testResult = new JSONObject();
+        testResult.put(TestResultConstants.TESTNAME,name);
+        JSONParser jsonParser = new JSONParser();
+        List<JSONObject> testResults = testRecords.stream().map(testRecord -> {
+            JSONObject testExec = new JSONObject();
+                try {
+                    JSONObject testData = (JSONObject) jsonParser.parse(testRecord);
+                    testExec.put(TestResultConstants.TESTDATA, testData);
+                    List<JSONObject> testCaseExecutionRes = testCases.stream().map(testCase -> testCase.executeTestCase(testData)).collect(Collectors.toList());
+                    testExec.put(TestResultConstants.TESTEXECRESULT,testCaseExecutionRes);
+                    testExec.put("testdataparsed","1");
+                } catch (ParseException e){
+                    e.printStackTrace();
+                    testExec.put(TestResultConstants.TESTDATA, testRecord);
+                    testExec.put("testdataparsed","0");
+                }
+            return testExec;
+        }).collect(Collectors.toList());
+        testResult.put(TestResultConstants.TESTRESULTS,testResults);
+        return testResult.toJSONString();
     }
 
     public String toString(){
@@ -61,7 +93,7 @@ public class TestConfig {
         stringBuilder.append(" , Sources -> [ \n");
         int sourceCnt = sources.size();
         int counter = 0;
-        for(SourceElement processElement: sources ){
+        for(SourceConfig processElement: sources ){
             if (counter ==0){
                 stringBuilder.append(processElement.toString());
             } else{
@@ -72,13 +104,13 @@ public class TestConfig {
         }
         stringBuilder.append("]\n");
         stringBuilder.append(" , Target -> ");
-        for(TargetElement processElement: targets ){
+        for(TargetConfig processElement: targets ){
             stringBuilder.append(processElement.toString()+"\n");
         }
         int testCaseCnt = testCases.size();
         counter = 0;
         stringBuilder.append(" , TestCases -> [");
-        for(TestCaseElement processElement: testCases ){
+        for(TestCaseConfig processElement: testCases ){
             if (counter ==0){
                 stringBuilder.append(processElement.toString());
             } else{
@@ -95,9 +127,9 @@ public class TestConfig {
     public static class TestConfigBuilder {
         private String name;
         private String type;
-        private List<SourceElement> sources = new ArrayList<SourceElement>();
-        private List<TargetElement> targets = new ArrayList<TargetElement>();
-        private List<TestCaseElement> testCases = new ArrayList<TestCaseElement>();
+        private List<SourceConfig> sources = new ArrayList<SourceConfig>();
+        private List<TargetConfig> targets = new ArrayList<TargetConfig>();
+        private List<TestCaseConfig> testCases = new ArrayList<TestCaseConfig>();
         private Properties testProperties = new Properties();
         public TestConfigBuilder createBuilder(){
             return new TestConfigBuilder();
@@ -110,15 +142,15 @@ public class TestConfig {
             this.type = type;
             return this;
         }
-        public TestConfigBuilder addSource(SourceElement processElement){
+        public TestConfigBuilder addSource(SourceConfig processElement){
             this.sources.add(processElement);
             return this;
         }
-        public TestConfigBuilder addTarget(TargetElement processElement){
+        public TestConfigBuilder addTarget(TargetConfig processElement){
             this.targets.add(processElement);
             return this;
         }
-        public TestConfigBuilder addTestCase(TestCaseElement processElement){
+        public TestConfigBuilder addTestCase(TestCaseConfig processElement){
             this.testCases.add(processElement);
             return this;
         }

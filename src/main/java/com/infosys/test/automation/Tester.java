@@ -1,15 +1,6 @@
 package com.infosys.test.automation;
 
-import com.infosys.test.automation.connectors.Connector;
-import com.infosys.test.automation.dto.CondElement;
-import com.infosys.test.automation.dto.SingleCondElement;
-import com.infosys.test.automation.utils.ConnectorUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import com.infosys.test.automation.utils.DataReaderUtils;
 
 public class Tester {
     public static void main(String args[]) throws Exception{
@@ -80,7 +71,7 @@ public class Tester {
     }
 
     private static Class<?> checkProvider() throws ClassNotFoundException {
-        Class<?> connectorClass = ConnectorUtils.getConnectorClass("flatfile");
+        Class<?> connectorClass = DataReaderUtils.getConnectorClass("flatfile");
         System.out.println("Class Name : "+connectorClass);
         return connectorClass;
     }

@@ -58,24 +58,24 @@ public class TestConfigLoader {
                 if (currentBuilder !=null){
                     builderTracker.push(currentBuilder);
                 }
-                currentBuilder = new SourceElement.SourceElementBuilder();
-                ((SourceElement.SourceElementBuilder) currentBuilder).setType(xmlStreamReader.getAttributeValue(0));
+                currentBuilder = new SourceConfig.SourceConfigBuilder();
+                ((SourceConfig.SourceConfigBuilder) currentBuilder).setType(xmlStreamReader.getAttributeValue(0));
                 break;
             }
             case TestConfigConstants.TARGET:{
                 if (currentBuilder !=null){
                     builderTracker.push(currentBuilder);
                 }
-                currentBuilder = new TargetElement.TargetElementBuilder();
-                ((TargetElement.TargetElementBuilder) currentBuilder).setType(xmlStreamReader.getAttributeValue(0));
+                currentBuilder = new TargetConfig.TargetConfigBuilder();
+                ((TargetConfig.TargetConfigBuilder) currentBuilder).setType(xmlStreamReader.getAttributeValue(0));
                 break;
             }
             case TestConfigConstants.TESTCASE:{
                 if (currentBuilder !=null){
                     builderTracker.push(currentBuilder);
                 }
-                currentBuilder = new TestCaseElement.TestCaseElementBuilder();
-                ((TestCaseElement.TestCaseElementBuilder) currentBuilder).setType(xmlStreamReader.getAttributeValue(0));
+                currentBuilder = new TestCaseConfig.TestCaseConfigBuilder();
+                ((TestCaseConfig.TestCaseConfigBuilder) currentBuilder).setType(xmlStreamReader.getAttributeValue(0));
                 break;
             }
             case TestConfigConstants.MULTIJOINCONDITION:
@@ -83,14 +83,14 @@ public class TestConfigLoader {
                 if (currentBuilder !=null){
                     builderTracker.push(currentBuilder);
                 }
-                currentBuilder = new MultiCondElement.MultiCondElementBuilder();
+                currentBuilder = new MultiCondConfig.MultiCondConfigBuilder();
                 int attriCount = xmlStreamReader.getAttributeCount();
 //                System.out.println("Multi Condition elem");
 //                for (int i=0 ; i<attriCount;i++){
 //                    System.out.println("Element name : "+xmlStreamReader.getAttributeName(i));
 //                    System.out.println("Element value : "+xmlStreamReader.getAttributeValue(i));
 //                }
-                ((MultiCondElement.MultiCondElementBuilder) currentBuilder).setLogicalOp(xmlStreamReader.getAttributeValue(0));
+                ((MultiCondConfig.MultiCondConfigBuilder) currentBuilder).setLogicalOp(xmlStreamReader.getAttributeValue(0));
                 break;
             }
             case TestConfigConstants.SINGLEJOINCONDITION:
@@ -98,15 +98,15 @@ public class TestConfigLoader {
                 if (currentBuilder !=null){
                     builderTracker.push(currentBuilder);
                 }
-                currentBuilder = new SingleCondElement.SingleCondElementBuilder();
-                ((SingleCondElement.SingleCondElementBuilder) currentBuilder).setOperator(xmlStreamReader.getAttributeValue(0));
+                currentBuilder = new SingleCondConfig.SingleCondConfigBuilder();
+                ((SingleCondConfig.SingleCondConfigBuilder) currentBuilder).setOperator(xmlStreamReader.getAttributeValue(0));
                 break;
             }
             case TestConfigConstants.COLUMN:{
                 int event = xmlStreamReader.next();
                 if (event == XMLStreamConstants.CHARACTERS && !xmlStreamReader.isWhiteSpace()){
                     String column = xmlStreamReader.getText().trim();
-                    ((SingleCondElement.SingleCondElementBuilder) currentBuilder).setColumn(column);
+                    ((SingleCondConfig.SingleCondConfigBuilder) currentBuilder).setColumn(column);
                 }
                 break;
             }
@@ -114,7 +114,7 @@ public class TestConfigLoader {
                 int event = xmlStreamReader.next();
                 if (event == XMLStreamConstants.CHARACTERS && !xmlStreamReader.isWhiteSpace()){
                     String value = xmlStreamReader.getText().trim();
-                    ((SingleCondElement.SingleCondElementBuilder) currentBuilder).setValue(value);
+                    ((SingleCondConfig.SingleCondConfigBuilder) currentBuilder).setValue(value);
                 }
                 break;
             }
@@ -123,14 +123,14 @@ public class TestConfigLoader {
                 if (currentBuilder instanceof TestConfig.TestConfigBuilder){
                     ((TestConfig.TestConfigBuilder) currentBuilder).setName(xmlStreamReader.getText().trim());
                 }
-                if (currentBuilder instanceof SourceElement.SourceElementBuilder){
-                    ((SourceElement.SourceElementBuilder) currentBuilder).setName(xmlStreamReader.getText().trim());
+                if (currentBuilder instanceof SourceConfig.SourceConfigBuilder){
+                    ((SourceConfig.SourceConfigBuilder) currentBuilder).setName(xmlStreamReader.getText().trim());
                 }
-                if (currentBuilder instanceof TargetElement.TargetElementBuilder){
-                    ((TargetElement.TargetElementBuilder) currentBuilder).setName(xmlStreamReader.getText().trim());
+                if (currentBuilder instanceof TargetConfig.TargetConfigBuilder){
+                    ((TargetConfig.TargetConfigBuilder) currentBuilder).setName(xmlStreamReader.getText().trim());
                 }
-                if (currentBuilder instanceof TestCaseElement.TestCaseElementBuilder){
-                    ((TestCaseElement.TestCaseElementBuilder) currentBuilder).setName(xmlStreamReader.getText().trim());
+                if (currentBuilder instanceof TestCaseConfig.TestCaseConfigBuilder){
+                    ((TestCaseConfig.TestCaseConfigBuilder) currentBuilder).setName(xmlStreamReader.getText().trim());
                 }
                 break;
             }
@@ -149,75 +149,75 @@ public class TestConfigLoader {
                 break;
             }
             case TestConfigConstants.SOURCE:{
-                SourceElement source = ((SourceElement.SourceElementBuilder)currentBuilder).build();
+                SourceConfig source = ((SourceConfig.SourceConfigBuilder)currentBuilder).build();
                 currentBuilder = builderTracker.pop();
                 if (currentBuilder instanceof TestConfig.TestConfigBuilder){
                     ((TestConfig.TestConfigBuilder) currentBuilder).addSource(source);
                 }
-                if (currentBuilder instanceof SourceElement.SourceElementBuilder){
-                    ((SourceElement.SourceElementBuilder) currentBuilder).addDependetSource(source);
+                if (currentBuilder instanceof SourceConfig.SourceConfigBuilder){
+                    ((SourceConfig.SourceConfigBuilder) currentBuilder).addDependetSource(source);
                 }
                 break;
             }
             case TestConfigConstants.TARGET:{
-                TargetElement target = ((TargetElement.TargetElementBuilder)currentBuilder).build();
+                TargetConfig target = ((TargetConfig.TargetConfigBuilder)currentBuilder).build();
                 currentBuilder = builderTracker.pop();
                 ((TestConfig.TestConfigBuilder)currentBuilder).addTarget(target);
                 break;
             }
             case TestConfigConstants.TESTCASE:{
-                TestCaseElement testCase = ((TestCaseElement.TestCaseElementBuilder) currentBuilder).build();
+                TestCaseConfig testCase = ((TestCaseConfig.TestCaseConfigBuilder) currentBuilder).build();
                 currentBuilder = builderTracker.pop();
                 ((TestConfig.TestConfigBuilder)currentBuilder).addTestCase(testCase);
                 break;
             }
             case TestConfigConstants.SINGLEFILTERCONDITION:{
-                SingleCondElement singleCondElem = ((SingleCondElement.SingleCondElementBuilder)currentBuilder).build();
+                SingleCondConfig singleCondElem = ((SingleCondConfig.SingleCondConfigBuilder)currentBuilder).build();
                 currentBuilder = builderTracker.pop();
-                if (currentBuilder instanceof MultiCondElement.MultiCondElementBuilder){
-                    ((MultiCondElement.MultiCondElementBuilder) currentBuilder).setSingleCond(singleCondElem);
+                if (currentBuilder instanceof MultiCondConfig.MultiCondConfigBuilder){
+                    ((MultiCondConfig.MultiCondConfigBuilder) currentBuilder).setSingleCond(singleCondElem);
                 }
-                if (currentBuilder instanceof SourceElement.SourceElementBuilder){
-                    ((SourceElement.SourceElementBuilder) currentBuilder).setFilterCondition(singleCondElem);
+                if (currentBuilder instanceof SourceConfig.SourceConfigBuilder){
+                    ((SourceConfig.SourceConfigBuilder) currentBuilder).setFilterCondition(singleCondElem);
                 }
                 break;
             }
             case TestConfigConstants.SINGLEJOINCONDITION:{
-                SingleCondElement singleCondElem = ((SingleCondElement.SingleCondElementBuilder)currentBuilder).build();
+                SingleCondConfig singleCondElem = ((SingleCondConfig.SingleCondConfigBuilder)currentBuilder).build();
                 currentBuilder = builderTracker.pop();
-                if (currentBuilder instanceof MultiCondElement.MultiCondElementBuilder){
-                    ((MultiCondElement.MultiCondElementBuilder) currentBuilder).setSingleCond(singleCondElem);
+                if (currentBuilder instanceof MultiCondConfig.MultiCondConfigBuilder){
+                    ((MultiCondConfig.MultiCondConfigBuilder) currentBuilder).setSingleCond(singleCondElem);
                 }
-                if (currentBuilder instanceof SourceElement.SourceElementBuilder){
-                    ((SourceElement.SourceElementBuilder) currentBuilder).setJoinCondition(singleCondElem);
+                if (currentBuilder instanceof SourceConfig.SourceConfigBuilder){
+                    ((SourceConfig.SourceConfigBuilder) currentBuilder).setJoinCondition(singleCondElem);
                 }
-                if (currentBuilder instanceof TargetElement.TargetElementBuilder){
-                    ((TargetElement.TargetElementBuilder) currentBuilder).setJoinCondition(singleCondElem);
+                if (currentBuilder instanceof TargetConfig.TargetConfigBuilder){
+                    ((TargetConfig.TargetConfigBuilder) currentBuilder).setJoinCondition(singleCondElem);
                 }
                 break;
             }
             case TestConfigConstants.MULTIFILTERCONDITION:{
-                MultiCondElement multiCondElement = ((MultiCondElement.MultiCondElementBuilder)currentBuilder).build();
+                MultiCondConfig multiCondConfig = ((MultiCondConfig.MultiCondConfigBuilder)currentBuilder).build();
                 currentBuilder = builderTracker.pop();
-                if (currentBuilder instanceof MultiCondElement.MultiCondElementBuilder){
-                    ((MultiCondElement.MultiCondElementBuilder) currentBuilder).setMultiCond(multiCondElement);
+                if (currentBuilder instanceof MultiCondConfig.MultiCondConfigBuilder){
+                    ((MultiCondConfig.MultiCondConfigBuilder) currentBuilder).setMultiCond(multiCondConfig);
                 }
-                if (currentBuilder instanceof SourceElement.SourceElementBuilder){
-                    ((SourceElement.SourceElementBuilder) currentBuilder).setFilterCondition(multiCondElement);
+                if (currentBuilder instanceof SourceConfig.SourceConfigBuilder){
+                    ((SourceConfig.SourceConfigBuilder) currentBuilder).setFilterCondition(multiCondConfig);
                 }
                 break;
             }
             case TestConfigConstants.MULTIJOINCONDITION:{
-                MultiCondElement multiCondElement = ((MultiCondElement.MultiCondElementBuilder)currentBuilder).build();
+                MultiCondConfig multiCondConfig = ((MultiCondConfig.MultiCondConfigBuilder)currentBuilder).build();
                 currentBuilder = builderTracker.pop();
-                if (currentBuilder instanceof MultiCondElement.MultiCondElementBuilder){
-                    ((MultiCondElement.MultiCondElementBuilder) currentBuilder).setMultiCond(multiCondElement);
+                if (currentBuilder instanceof MultiCondConfig.MultiCondConfigBuilder){
+                    ((MultiCondConfig.MultiCondConfigBuilder) currentBuilder).setMultiCond(multiCondConfig);
                 }
-                if (currentBuilder instanceof SourceElement.SourceElementBuilder){
-                    ((SourceElement.SourceElementBuilder) currentBuilder).setJoinCondition(multiCondElement);
+                if (currentBuilder instanceof SourceConfig.SourceConfigBuilder){
+                    ((SourceConfig.SourceConfigBuilder) currentBuilder).setJoinCondition(multiCondConfig);
                 }
-                if (currentBuilder instanceof TargetElement.TargetElementBuilder){
-                    ((TargetElement.TargetElementBuilder) currentBuilder).setJoinCondition(multiCondElement);
+                if (currentBuilder instanceof TargetConfig.TargetConfigBuilder){
+                    ((TargetConfig.TargetConfigBuilder) currentBuilder).setJoinCondition(multiCondConfig);
                 }
                 break;
             }
@@ -238,16 +238,16 @@ public class TestConfigLoader {
             if (event == XMLStreamConstants.CHARACTERS && !xmlStreamReader.isWhiteSpace()){
                 String value = xmlStreamReader.getText().trim();
                 if (currentBuilder instanceof TestConfig.TestConfigBuilder){
-                    ((TestConfig.TestConfigBuilder) currentBuilder).addProperty(elementName,value);
+                    ((TestConfig.TestConfigBuilder) currentBuilder).addProperty(elementName.toLowerCase(Locale.ROOT),value);
                 }
-                if (currentBuilder instanceof SourceElement.SourceElementBuilder){
-                    ((SourceElement.SourceElementBuilder) currentBuilder).addProperty(elementName,value);
+                if (currentBuilder instanceof SourceConfig.SourceConfigBuilder){
+                    ((SourceConfig.SourceConfigBuilder) currentBuilder).addProperty(elementName.toLowerCase(Locale.ROOT),value);
                 }
-                if (currentBuilder instanceof TargetElement.TargetElementBuilder){
-                    ((TargetElement.TargetElementBuilder) currentBuilder).addProperty(elementName,value);
+                if (currentBuilder instanceof TargetConfig.TargetConfigBuilder){
+                    ((TargetConfig.TargetConfigBuilder) currentBuilder).addProperty(elementName.toLowerCase(Locale.ROOT),value);
                 }
-                if (currentBuilder instanceof TestCaseElement.TestCaseElementBuilder){
-                    ((TestCaseElement.TestCaseElementBuilder) currentBuilder).addProperty(elementName,value);
+                if (currentBuilder instanceof TestCaseConfig.TestCaseConfigBuilder){
+                    ((TestCaseConfig.TestCaseConfigBuilder) currentBuilder).addProperty(elementName.toLowerCase(Locale.ROOT),value);
                 }
             }
 

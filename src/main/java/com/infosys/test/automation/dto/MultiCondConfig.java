@@ -5,18 +5,18 @@ import org.json.simple.parser.ParseException;
 
 import java.util.Locale;
 
-public class MultiCondElement implements CondElement {
+public class MultiCondConfig implements CondConfig {
     private String logicalOp;
-    private SingleCondElement filterElem1;
-    private SingleCondElement filterElem2;
-    private MultiCondElement filterElem3;
-    private MultiCondElement filterElem4;
-    private MultiCondElement(){
+    private SingleCondConfig filterElem1;
+    private SingleCondConfig filterElem2;
+    private MultiCondConfig filterElem3;
+    private MultiCondConfig filterElem4;
+    private MultiCondConfig(){
 
     }
-    private MultiCondElement(String logicalOp, SingleCondElement filterElem1,
-                             SingleCondElement filterElem2, MultiCondElement filterElem3,
-                             MultiCondElement filterElem4){
+    private MultiCondConfig(String logicalOp, SingleCondConfig filterElem1,
+                            SingleCondConfig filterElem2, MultiCondConfig filterElem3,
+                            MultiCondConfig filterElem4){
         this.logicalOp = logicalOp;
         this.filterElem1 = filterElem1;
         this.filterElem2 = filterElem2;
@@ -107,20 +107,20 @@ public class MultiCondElement implements CondElement {
         return result;
     }
 
-    public static class MultiCondElementBuilder{
+    public static class MultiCondConfigBuilder {
         private String logicalOp;
-        private SingleCondElement filterElem1;
-        private SingleCondElement filterElem2;
-        private MultiCondElement filterElem3;
-        private MultiCondElement filterElem4;
+        private SingleCondConfig filterElem1;
+        private SingleCondConfig filterElem2;
+        private MultiCondConfig filterElem3;
+        private MultiCondConfig filterElem4;
 
-        public MultiCondElementBuilder setLogicalOp(String logicalOp){
+        public MultiCondConfigBuilder setLogicalOp(String logicalOp){
 //            System.out.println("Multi Condition logical op : "+logicalOp);
             this.logicalOp = logicalOp;
             return this;
         }
 
-        public MultiCondElementBuilder setSingleCond(SingleCondElement singleFltrElem){
+        public MultiCondConfigBuilder setSingleCond(SingleCondConfig singleFltrElem){
             if (this.filterElem1 == null){
                 this.filterElem1 = singleFltrElem;
             } else if (this.filterElem2 == null){
@@ -128,7 +128,7 @@ public class MultiCondElement implements CondElement {
             }
             return this;
         }
-        public MultiCondElementBuilder setMultiCond(MultiCondElement multiFltrElem){
+        public MultiCondConfigBuilder setMultiCond(MultiCondConfig multiFltrElem){
             if (this.filterElem3 == null){
                 this.filterElem3 = multiFltrElem;
             } else if (this.filterElem4 == null){
@@ -137,8 +137,8 @@ public class MultiCondElement implements CondElement {
             return this;
         }
 
-        public MultiCondElement build(){
-            return new MultiCondElement(this.logicalOp,this.filterElem1,this.filterElem2,this.filterElem3,this.filterElem4);
+        public MultiCondConfig build(){
+            return new MultiCondConfig(this.logicalOp,this.filterElem1,this.filterElem2,this.filterElem3,this.filterElem4);
         }
     }
 
