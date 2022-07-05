@@ -16,5 +16,6 @@ public interface TestConfigConstants {
     public static final String COLUMN = "COLUMN";
     public static final String VALUE = "VALUE";
     public static final String OPERATOR = "OPERATOR";
-
+    public static final String TESTREPORTLOCATION= "testreportlocation";
+    public static final String TESTREPORTFORMAT= "testreportformat";
 }

@@ -1,5 +1,6 @@
 package com.infosys.test.automation.dto;
 
+import com.infosys.test.automation.constants.TestConfigConstants;
 import com.infosys.test.automation.constants.TestResultConstants;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -82,6 +83,19 @@ public class TestConfig {
         }).collect(Collectors.toList());
         testResult.put(TestResultConstants.TESTRESULTS,testResults);
         return testResult.toJSONString();
+    }
+
+
+    public String getTestName(){
+        return this.name;
+    }
+
+    public String getReportFolder(){
+        return this.testProperties.getProperty(TestConfigConstants.TESTREPORTLOCATION);
+    }
+
+    public String getReportFormat(){
+        return this.testProperties.getProperty(TestConfigConstants.TESTREPORTFORMAT);
     }
 
     public String toString(){

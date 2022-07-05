@@ -2,7 +2,10 @@ package com.infosys.test.automation;
 
 
 import com.infosys.test.automation.dto.TestConfig;
+import com.infosys.test.automation.reportgenerator.ReportGenerator;
+import com.infosys.test.automation.utils.ReportGeneratorUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class TestExecutor {
@@ -22,6 +25,12 @@ public class TestExecutor {
 //        }
         String testResult = testConfig.executeTestCases();
         System.out.println("Test Result : "+testResult);
+        generateTestReport(testConfig.getReportFormat(),testConfig.getTestName(),testConfig.getReportFolder(),testResult);
         return testResult;
+    }
+
+    public void generateTestReport(String testReporFomat,String testName,String testReportLoc,String testResult) throws Exception {
+        ReportGenerator reportGenerator = ReportGeneratorUtils.createReportGenerator(testReporFomat);
+        reportGenerator.generateReport(testName,testReportLoc,testResult);
     }
 }
