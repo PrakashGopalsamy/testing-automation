@@ -5,7 +5,6 @@ import com.infosys.test.automation.dto.TestConfig;
 import com.infosys.test.automation.reportgenerator.ReportGenerator;
 import com.infosys.test.automation.utils.ReportGeneratorUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class TestExecutor {
