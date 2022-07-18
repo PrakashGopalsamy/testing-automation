@@ -29,6 +29,11 @@
             <artifactId>testing-automation-report-generator</artifactId>
             <version>0.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>testing-automation-common</artifactId>
+            <version>0.0.1</version>
+        </dependency>
     </dependencies>
 
 </project>
