@@ -1,6 +1,7 @@
 package com.infosys.test.automation.dto;
 
 import com.infosys.test.automation.connectors.DataReader;
+import com.infosys.test.automation.exceptions.InvalidTargetConfigException;
 import com.infosys.test.automation.utils.DataReaderUtils;
 
 import java.util.List;
@@ -15,11 +16,12 @@ public class TargetConfig {
     private TargetConfig(){
 
     }
-    private TargetConfig(String name, String type, Properties targetProperties, CondConfig joinCondConfig){
+    private TargetConfig(String name, String type, Properties targetProperties, CondConfig joinCondConfig) throws InvalidTargetConfigException {
         this.name = name;
         this.type = type;
         this.targetProperties = targetProperties;
         this.joinCondConfig = joinCondConfig;
+        validateProperties();
     }
 
     public List<String> readTargetData(List<String> parentData) throws Exception {
@@ -27,6 +29,27 @@ public class TargetConfig {
         DataReader targetReader = DataReaderUtils.createReader(this.type,this.name,this.targetProperties,this.parentRecords,null, joinCondConfig);
         this.parentRecords = targetReader.getData();
         return this.parentRecords;
+    }
+
+    private void validateProperties() throws InvalidTargetConfigException {
+        boolean validProps = true;
+        StringBuilder exceptionMessageBuilder = new StringBuilder();
+        if (name == null || name.trim().length() == 0){
+            exceptionMessageBuilder.append("The required element \"name\" is not been provided in target config\n");
+            validProps=false;
+        }
+        if (type == null || type.trim().length() == 0){
+            exceptionMessageBuilder.append("The required attribute \"type\" is not been provided in the target config \""+name+"\"\n");
+            validProps=false;
+        }
+        if (targetProperties.stringPropertyNames().size() == 0){
+            exceptionMessageBuilder.append("No Target config properties like \"sourcecolumns\" is provided in the target config \""+name+"\"\n");
+            validProps=false;
+        }
+
+        if (!validProps){
+            throw new InvalidTargetConfigException(exceptionMessageBuilder.toString());
+        }
     }
 
     public String toString(){
@@ -66,7 +89,7 @@ public class TargetConfig {
             this.joinCondConfig = joinCondConfig;
             return this;
         }
-        public TargetConfig build(){
+        public TargetConfig build() throws InvalidTargetConfigException {
             return new TargetConfig(name,type,targetProperties, joinCondConfig);
         }
     }

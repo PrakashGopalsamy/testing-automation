@@ -1,6 +1,7 @@
 package com.infosys.test.automation.dto;
 
 import com.infosys.test.automation.connectors.DataReader;
+import com.infosys.test.automation.exceptions.InvlaidSourceConfigException;
 import com.infosys.test.automation.utils.DataReaderUtils;
 
 import java.util.ArrayList;
@@ -18,13 +19,14 @@ public class SourceConfig {
     private SourceConfig(){
 
     }
-    private SourceConfig(String name, String type, List<SourceConfig> dependentSources, Properties sourceProperties, CondConfig filterCondConfig, CondConfig joinCondConfig){
+    private SourceConfig(String name, String type, List<SourceConfig> dependentSources, Properties sourceProperties, CondConfig filterCondConfig, CondConfig joinCondConfig) throws InvlaidSourceConfigException {
         this.name = name;
         this.type = type;
         this.dependentSources = dependentSources;
         this.sourceProperties = sourceProperties;
         this.filterCondConfig = filterCondConfig;
         this.joinCondConfig = joinCondConfig;
+        validateProperties();
     }
     public List<String> readSourceData(List<String> parentData) throws Exception {
         parentRecords = parentData;
@@ -39,6 +41,28 @@ public class SourceConfig {
         });
         return this.parentRecords;
     }
+
+    private void validateProperties() throws InvlaidSourceConfigException {
+        boolean validProps = true;
+        StringBuilder exceptionMessageBuilder = new StringBuilder();
+        if (name == null || name.trim().length() == 0){
+            exceptionMessageBuilder.append("The required element \"name\" is not been provided in source config\n");
+            validProps=false;
+        }
+        if (type == null || type.trim().length() == 0){
+            exceptionMessageBuilder.append("The required attribute \"type\" is not been provided in the source config \""+name+"\"\n");
+            validProps=false;
+        }
+        if (sourceProperties.stringPropertyNames().size() == 0){
+            exceptionMessageBuilder.append("No Source config properties like \"sourcecolumns\" is provided in the source config \""+name+"\"\n");
+            validProps=false;
+        }
+
+        if (!validProps){
+            throw new InvlaidSourceConfigException(exceptionMessageBuilder.toString());
+        }
+    }
+
     public String toString(){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{ element type -> source");
@@ -97,7 +121,7 @@ public class SourceConfig {
             this.joinCondConfig = joinCondConfig;
             return this;
         }
-        public SourceConfig build(){
+        public SourceConfig build() throws InvlaidSourceConfigException {
             return new SourceConfig(name,type,dependentSources,sourceProperties, filterCondConfig, joinCondConfig);
         }
     }

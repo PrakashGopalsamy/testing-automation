@@ -92,29 +92,29 @@ public class Tester {
     private static void runTestExecutor() throws Exception {
         TestExecutor testExecutor = new TestExecutor("J:\\testing_automation\\flatfiletestconfig.xml");
         String jsonRes = testExecutor.executeTest();
-        JSONParser jsonParser = new JSONParser();
-        JSONObject testRes = (JSONObject) jsonParser.parse(jsonRes);
-        JSONArray testResults = (JSONArray) testRes.get("testresults");
-        testResults.forEach(testResult-> {
-            JSONObject resultObject = (JSONObject) testResult;
-            int testDataPos = 1;
-            System.out.println("TestData : "+((JSONObject)resultObject.get("testdata")).toString());
-            JSONArray testExecResults = (JSONArray) resultObject.get("testexecutiontresult");
-            testExecResults.forEach(testExecResult -> {
-                JSONObject execResObj = (JSONObject) testExecResult;
-                String testCaseName = ((String)execResObj.get("testcasename")).replaceAll("\\ +","_");
-                int testCasePos = 1;
-                JSONArray validationResults = (JSONArray) execResObj.get("validationresults");
-                validationResults.forEach(validationResult -> {
-                    JSONObject validationResObj = (JSONObject)validationResult;
-                    String fullTestCaseName = testCaseName+"_"+testDataPos+"_"+testCasePos;
-                    String testSource = (String)validationResObj.get("sourcecolumn")+":"+(String)validationResObj.get("sourcevalue");
-                    String testTarget = (String)validationResObj.get("targetcolumn")+":"+(String)validationResObj.get("targetvalue");
-                    String testValResult = (String)validationResObj.get("testresult");
-                    System.out.println(fullTestCaseName+","+testSource+","+testTarget+","+testValResult);
-                });
-            });
-        });
+//        JSONParser jsonParser = new JSONParser();
+//        JSONObject testRes = (JSONObject) jsonParser.parse(jsonRes);
+//        JSONArray testResults = (JSONArray) testRes.get("testresults");
+//        testResults.forEach(testResult-> {
+//            JSONObject resultObject = (JSONObject) testResult;
+//            int testDataPos = 1;
+//            System.out.println("TestData : "+((JSONObject)resultObject.get("testdata")).toString());
+//            JSONArray testExecResults = (JSONArray) resultObject.get("testexecutiontresult");
+//            testExecResults.forEach(testExecResult -> {
+//                JSONObject execResObj = (JSONObject) testExecResult;
+//                String testCaseName = ((String)execResObj.get("testcasename")).replaceAll("\\ +","_");
+//                int testCasePos = 1;
+//                JSONArray validationResults = (JSONArray) execResObj.get("validationresults");
+//                validationResults.forEach(validationResult -> {
+//                    JSONObject validationResObj = (JSONObject)validationResult;
+//                    String fullTestCaseName = testCaseName+"_"+testDataPos+"_"+testCasePos;
+//                    String testSource = (String)validationResObj.get("sourcecolumn")+":"+(String)validationResObj.get("sourcevalue");
+//                    String testTarget = (String)validationResObj.get("targetcolumn")+":"+(String)validationResObj.get("targetvalue");
+//                    String testValResult = (String)validationResObj.get("testresult");
+//                    System.out.println(fullTestCaseName+","+testSource+","+testTarget+","+testValResult);
+//                });
+//            });
+//        });
 
     }
 }

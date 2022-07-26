@@ -3,6 +3,9 @@ package com.infosys.test.automation;
 import com.infosys.test.automation.constants.TestConfigConstants;
 import com.infosys.test.automation.dto.*;
 import com.infosys.test.automation.exceptions.IllegalNodeException;
+import com.infosys.test.automation.exceptions.InvalidTargetConfigException;
+import com.infosys.test.automation.exceptions.InvalidTestCaseConfigException;
+import com.infosys.test.automation.exceptions.InvlaidSourceConfigException;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -23,7 +26,7 @@ public class TestConfigLoader {
         this.testConfigFile = testConfigFile;
     }
 
-    public TestConfig load() throws IllegalNodeException, FileNotFoundException, XMLStreamException {
+    public TestConfig load() throws IllegalNodeException, FileNotFoundException, XMLStreamException, InvlaidSourceConfigException, InvalidTargetConfigException, InvalidTestCaseConfigException {
         FileInputStream fileInputStream = new FileInputStream(testConfigFile);
         InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
@@ -160,7 +163,7 @@ public class TestConfigLoader {
         return name;
     }
 
-    private void processEndElement(XMLStreamReader xmlStreamReader){
+    private void processEndElement(XMLStreamReader xmlStreamReader) throws InvlaidSourceConfigException, InvalidTargetConfigException, InvalidTestCaseConfigException {
         String name = xmlStreamReader.getLocalName();
 //        System.out.println("Element Name : "+name);
         switch (name.toUpperCase(Locale.ROOT)){

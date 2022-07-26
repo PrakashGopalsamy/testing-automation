@@ -1,6 +1,8 @@
 package com.infosys.test.automation.dto;
 
 import com.infosys.test.automation.constants.TestResultConstants;
+import com.infosys.test.automation.exceptions.InvalidTestCaseConfigException;
+import com.infosys.test.automation.exceptions.InvlaidSourceConfigException;
 import org.json.simple.JSONObject;
 
 import java.util.Arrays;
@@ -13,11 +15,11 @@ public class TestCaseConfig {
     private TestCaseConfig(){
 
     }
-    private TestCaseConfig(String name, String type, Properties testCaseProperties){
+    private TestCaseConfig(String name, String type, Properties testCaseProperties) throws InvalidTestCaseConfigException {
         this.name = name;
         this.type = type;
         this.testCaseProperties = testCaseProperties;
-
+        validateProperties();
     }
 
     public JSONObject executeTestCase(JSONObject testRecord) {
@@ -50,6 +52,32 @@ public class TestCaseConfig {
         return testExecutionResult;
     }
 
+    private void validateProperties() throws InvalidTestCaseConfigException {
+        boolean validProps = true;
+        StringBuilder exceptionMessageBuilder = new StringBuilder();
+        if (name == null || name.trim().length() == 0){
+            exceptionMessageBuilder.append("The required element \"name\" is not been provided in testcase config\n");
+            validProps=false;
+        }
+        if (type == null || type.trim().length() == 0){
+            exceptionMessageBuilder.append("The required attribute \"type\" is not been provided in the testcase config \""+name+"\"\n");
+            validProps=false;
+        }
+        String sourceColumns = testCaseProperties.getProperty(TestResultConstants.SOURCECOLUMNS);
+        if (sourceColumns == null || sourceColumns.trim().length() == 0){
+            exceptionMessageBuilder.append("The required testcase property \""+TestResultConstants.SOURCECOLUMNS+"\" is not provided in the testcase config \""+name+"\"\n");
+            validProps=false;
+        }
+        String targetColumns = testCaseProperties.getProperty(TestResultConstants.TARGETCOLUMNS);
+        if (targetColumns == null || targetColumns.trim().length() == 0){
+            exceptionMessageBuilder.append("The required testcase property \""+TestResultConstants.TARGETCOLUMNS+"\" is not provided in the testcase config \""+name+"\"\n");
+            validProps=false;
+        }
+
+        if (!validProps){
+            throw new InvalidTestCaseConfigException(exceptionMessageBuilder.toString());
+        }
+    }
 
     public String toString(){
         StringBuilder stringBuilder = new StringBuilder();
@@ -80,7 +108,7 @@ public class TestCaseConfig {
             this.testCaseProperties.setProperty(key,value);
             return this;
         }
-        public TestCaseConfig build(){
+        public TestCaseConfig build() throws InvalidTestCaseConfigException {
             return new TestCaseConfig(name,type,testCaseProperties);
         }
     }
